@@ -5,6 +5,9 @@
 
 A high-performance, memory-efficient CSV to newline-delimited JSON (NDJSON) converter written in Rust. This tool automatically detects CSV formats and streams data to handle files of any size.
 
+## Why NDJSON instead of JSON
+Well, with NDJSON (each object being on a new line instead of being in 1 json array) it's significantly easier to proces rows in batches/in parellel because you can buffer your reads of disk and paralise the json deserialization.
+
 ## Features
 
 - **Automatic Format Detection**: Automatically detects delimiter (comma, semicolon, tab, pipe), quote characters, and line terminators
