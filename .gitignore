@@ -1,0 +1,7 @@
+/target
+*.ndjson
+test*.csv
+tests/fixtures/
+
+.claude/
+.idea/
