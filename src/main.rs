@@ -3,8 +3,8 @@ use clap::Parser;
 use csv::Terminator;
 use std::path::PathBuf;
 
-use csv_converter::{detect_csv_format, detect_file_format, CsvParser, FileFormat, XlsxParser};
 use csv_converter::parsers::Parser as ParserTrait;
+use csv_converter::{detect_csv_format, detect_file_format, CsvParser, FileFormat, XlsxParser};
 
 #[derive(clap::Parser, Debug)]
 #[command(

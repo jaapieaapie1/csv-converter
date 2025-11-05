@@ -116,8 +116,7 @@ impl Parser for XlsxParser {
             }
 
             // Write JSON object as a single line
-            let json_line =
-                serde_json::to_string(&json_obj).context("Failed to serialize JSON")?;
+            let json_line = serde_json::to_string(&json_obj).context("Failed to serialize JSON")?;
             writeln!(writer, "{}", json_line).context("Failed to write output")?;
 
             record_count += 1;
