@@ -90,38 +90,12 @@ jobs:
           strip target/${{ matrix.target }}/release/${{ matrix.binary_name }}
         fi
 
-    - name: Create archive (Linux and macOS)
-      if: matrix.os != 'windows-latest'
-      run: |
-        cd target/${{ matrix.target }}/release
-        tar czf ${{ matrix.asset_name }}.tar.gz ${{ matrix.binary_name }}
-        mv ${{ matrix.asset_name }}.tar.gz ../../..
-
-    - name: Create archive (Windows)
-      if: matrix.os == 'windows-latest'
-      run: |
-        cd target/${{ matrix.target }}/release
-        7z a ${{ matrix.asset_name }}.zip ${{ matrix.binary_name }}
-        move ${{ matrix.asset_name }}.zip ..\..\..
-
-    - name: Upload release asset (Linux and macOS)
-      if: matrix.os != 'windows-latest'
+    - name: Upload release asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./${{ matrix.asset_name }}.tar.gz
-        asset_name: ${{ matrix.asset_name }}.tar.gz
-        asset_content_type: application/gzip
-
-    - name: Upload release asset (Windows)
-      if: matrix.os == 'windows-latest'
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ./${{ matrix.asset_name }}.zip
-        asset_name: ${{ matrix.asset_name }}.zip
-        asset_content_type: application/zip
+        asset_path: ./target/${{ matrix.target }}/release/${{ matrix.binary_name }}
+        asset_name: ${{ matrix.asset_name }}
+        asset_content_type: application/octet-stream
