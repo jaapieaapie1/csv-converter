@@ -1,5 +1,4 @@
 /target
-*.ndjson
 test*.csv
 tests/fixtures/
 
