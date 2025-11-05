@@ -3,7 +3,7 @@
 [![CI](https://github.com/jaapieaapie1/csv-converter/actions/workflows/ci.yml/badge.svg)](https://github.com/jaapieaapie1/csv-converter/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A high-performance, memory-efficient CSV to newline-delimited JSON (NDJSON) converter written in Rust. This tool automatically detects CSV formats and streams data to handle files of any size.
+A high-performance, memory-efficient CSV (and XLSX) to newline-delimited JSON (NDJSON) converter written in Rust. This tool automatically detects CSV formats and streams data to handle files of any size.
 
 ## Why NDJSON instead of JSON
 Well, with NDJSON (each object being on a new line instead of being in 1 json array) it's significantly easier to proces rows in batches/in parellel because you can buffer your reads of disk and paralise the json deserialization.
@@ -278,7 +278,7 @@ All tests are located in:
 - `tests/integration_tests.rs` - Integration tests
 
 ### Todos
- - [ ] Add xlsx support
+ - [x] Add xlsx support
  - [ ] Add multi-threaded processing
 
 ## License
