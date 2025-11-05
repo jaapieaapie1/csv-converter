@@ -1,3 +1,5 @@
+#![allow(clippy::approx_constant)]
+
 use anyhow::{Context, Result};
 use csv::{ReaderBuilder, Terminator};
 use serde_json::{Map, Value};
@@ -251,7 +253,6 @@ mod tests {
         let value = convert_field_value("3.14", "price", false, &[]);
         assert!(matches!(value, Value::Number(_)));
         if let Value::Number(n) = value {
-            #[allow(clippy::approx_constant)]
             assert_eq!(n.as_f64(), Some(3.14));
         }
     }
