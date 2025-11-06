@@ -61,38 +61,54 @@ pub fn detect_csv_format(file_path: &Path) -> Result<(u8, u8, Option<u8>, Termin
         return Ok((b',', b'"', None, Terminator::CRLF));
     }
 
-    // Detect delimiter by counting common delimiters
     let possible_delimiters = vec![b',', b';', b'\t', b'|'];
-    let mut delimiter_scores: Vec<(u8, usize)> = Vec::new();
 
-    for &delim in &possible_delimiters {
-        // Count occurrences in first non-empty line
-        if let Some(first_line) = lines.first() {
-            let count = first_line
-                .as_bytes()
-                .iter()
-                .filter(|&&c| c == delim)
-                .count();
-            if count > 0 {
-                // Check if count is consistent across lines
-                let mut consistent = true;
-                for line in &lines[1..] {
-                    let line_count = line.as_bytes().iter().filter(|&&c| c == delim).count();
-                    if line_count != count && !line.is_empty() {
-                        consistent = false;
-                        break;
-                    }
-                }
-                if consistent {
-                    delimiter_scores.push((delim, count));
-                }
-            }
-        }
+    #[derive(Debug)]
+    struct DelimiterScore {
+        delimiter: u8,
+        total_score: f64,
     }
 
-    // Choose delimiter with highest count
-    delimiter_scores.sort_by(|a, b| b.1.cmp(&a.1));
-    let delimiter = delimiter_scores.first().map(|(d, _)| *d).unwrap_or(b',');
+    let mut delimiter_scores: Vec<DelimiterScore> = Vec::new();
+
+    for &delim in &possible_delimiters {
+        // Count occurrences across all non-empty lines
+        let mut counts: Vec<usize> = Vec::new();
+        for line in &lines {
+            if !line.is_empty() {
+                let count = line.as_bytes().iter().filter(|&&c| c == delim).count();
+                counts.push(count);
+            }
+        }
+
+        if counts.is_empty() || counts.iter().all(|&c| c == 0) {
+            continue;
+        }
+
+        let total: usize = counts.iter().sum();
+        let avg_count = total as f64 / counts.len() as f64;
+
+        let mut count_freq: std::collections::HashMap<usize, usize> =
+            std::collections::HashMap::new();
+        for &count in &counts {
+            *count_freq.entry(count).or_insert(0) += 1;
+        }
+        let most_common_count_freq = count_freq.values().max().unwrap_or(&0);
+        let consistency_ratio = *most_common_count_freq as f64 / counts.len() as f64;
+
+        let total_score = avg_count * (0.7 + 0.3 * consistency_ratio);
+
+        delimiter_scores.push(DelimiterScore {
+            delimiter: delim,
+            total_score,
+        });
+    }
+
+    delimiter_scores.sort_by(|a, b| b.total_score.partial_cmp(&a.total_score).unwrap());
+    let delimiter = delimiter_scores
+        .first()
+        .map(|s| s.delimiter)
+        .unwrap_or(b',');
 
     // Detect line terminator
     let terminator = if lines.iter().any(|_| true) {
